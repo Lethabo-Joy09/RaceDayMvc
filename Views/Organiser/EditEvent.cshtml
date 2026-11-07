@@ -1,0 +1,66 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "Edit Event";
+    var eventId = Model.GetProperty("eventId").GetInt32();
+    var currentDate = Model.GetProperty("eventDate").GetDateTime().ToString("yyyy-MM-ddTHH:mm");
+}
+
+<div class="container mt-4">
+    <h2>Edit Event</h2>
+    <hr />
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post" action="/Organiser/EditEvent/@eventId">
+        <div class="mb-3">
+            <label>Event Name</label>
+            <input type="text" name="eventName" class="form-control" value="@Model.GetProperty("eventName").GetString()" required />
+        </div>
+        
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="3">@Model.GetProperty("description").GetString()</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label>Event Date</label>
+            <input type="datetime-local" name="eventDate" class="form-control" value="@currentDate" required />
+        </div>
+        
+        <div class="mb-3">
+            <label>Location</label>
+            <input type="text" name="location" class="form-control" value="@Model.GetProperty("location").GetString()" required />
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Distance (KM)</label>
+                <input type="number" step="any" name="distance" class="form-control" value="@Model.GetProperty("distance").GetDecimal()" required />
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label>Event Type</label>
+                <select name="eventType" class="form-control">
+                    <option value="Run" selected="@(Model.GetProperty("eventType").GetString() == "Run")">Run</option>
+                    <option value="Walk" selected="@(Model.GetProperty("eventType").GetString() == "Walk")">Walk</option>
+                    <option value="Cycle" selected="@(Model.GetProperty("eventType").GetString() == "Cycle")">Cycle</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="Open" selected="@(Model.GetProperty("status").GetString() == "Open")">Open</option>
+                    <option value="Closed" selected="@(Model.GetProperty("status").GetString() == "Closed")">Closed</option>
+                    <option value="Cancelled" selected="@(Model.GetProperty("status").GetString() == "Cancelled")">Cancelled</option>
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="/Organiser/Events" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

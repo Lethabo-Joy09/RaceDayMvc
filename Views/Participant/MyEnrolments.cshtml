@@ -1,0 +1,56 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>My Enrolments</h2>
+        <a href="/Participant" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (Model.ValueKind == System.Text.Json.JsonValueKind.Array && Model.GetArrayLength() > 0)
+    {
+        <table class="table table-striped mt-3 align-middle">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Event Date</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Enrolment Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var enrol in Model.EnumerateArray())
+                {
+                    <tr>
+                        <td>@enrol.GetProperty("eventName").GetString()</td>
+                        <td>@enrol.GetProperty("eventDate").GetDateTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@enrol.GetProperty("categoryName").GetString()</td>
+                        <td>R @enrol.GetProperty("price").GetDecimal().ToString("F2")</td>
+                        <td>@enrol.GetProperty("enrolmentDate").GetDateTime().ToString("yyyy-MM-dd")</td>
+                        <td>
+                            @{
+                                var status = enrol.GetProperty("status").GetString();
+                                var badgeClass = status == "Confirmed" ? "bg-success" : status == "Pending" ? "bg-warning text-dark" : "bg-secondary";
+                            }
+                            <span class="badge @badgeClass">@status</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">You have not enrolled in any events yet.</div>
+    }
+</div>

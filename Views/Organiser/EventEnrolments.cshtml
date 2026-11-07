@@ -1,0 +1,81 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "Event Enrolments";
+    var eventId = ViewBag.EventId;
+    var eventName = ViewBag.EventName;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Enrolments: @eventName</h2>
+        <a href="/Organiser/Events" class="btn btn-secondary">Back to Events</a>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (Model.ValueKind == System.Text.Json.JsonValueKind.Array && Model.GetArrayLength() > 0)
+    {
+        <table class="table table-striped mt-3 align-middle">
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Category</th>
+                    <th>Enrolment Date</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var enrol in Model.EnumerateArray())
+                {
+                    var enrolmentId = enrol.GetProperty("enrolmentId").GetInt32();
+                    var status = enrol.GetProperty("status").GetString();
+                    var badgeClass = status == "Confirmed" ? "bg-success" : status == "Pending" ? "bg-warning text-dark" : "bg-secondary";
+                    
+                    var hasResult = enrol.TryGetProperty("result", out var res) && res.ValueKind != System.Text.Json.JsonValueKind.Null;
+
+                    <tr>
+                        <td>@enrol.GetProperty("participantName").GetString()</td>
+                        <td>@enrol.GetProperty("categoryName").GetString()</td>
+                        <td>@enrol.GetProperty("enrolmentDate").GetDateTime().ToString("yyyy-MM-dd")</td>
+                        <td><span class="badge @badgeClass">@status</span></td>
+                        <td>
+                            @if (hasResult)
+                            {
+                                var finishTime = res.GetProperty("finishTime").GetString();
+                                var position = res.GetProperty("position");
+                                
+                                <span class="text-success fw-bold">@finishTime</span>
+                                if (position.ValueKind != System.Text.Json.JsonValueKind.Null)
+                                {
+                                    <span> (Pos: @position.GetInt32())</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not captured</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!hasResult)
+                            {
+                                <a href="/Organiser/CaptureResult/@enrolmentId" class="btn btn-sm btn-success">Capture Result</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">
+            No participants have enrolled in this event yet.
+        </div>
+    }
+</div>

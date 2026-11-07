@@ -1,0 +1,64 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>My Race Results</h2>
+        <a href="/Participant" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    <hr />
+
+    @if (Model.ValueKind == System.Text.Json.JsonValueKind.Array && Model.GetArrayLength() > 0)
+    {
+        <table class="table table-striped mt-3 align-middle">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Category</th>
+                    <th>Finish Time</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var result in Model.EnumerateArray())
+                {
+                    var finishTime = result.GetProperty("finishTime").GetString();
+                    
+                    // Safely parse the time to fix the warning
+                    var timeSpan = TimeSpan.TryParse(finishTime, out var parsedTime) ? parsedTime : TimeSpan.Zero;
+                    var formattedTime = $"{(int)timeSpan.TotalHours}h {timeSpan.Minutes}m {timeSpan.Seconds}s";
+
+                    <tr>
+                        <td>@result.GetProperty("eventName").GetString()</td>
+                        <td>@result.GetProperty("categoryName").GetString()</td>
+                        <td><strong>@formattedTime</strong></td>
+                        <td>
+                            @if (result.TryGetProperty("position", out var pos) && pos.ValueKind != System.Text.Json.JsonValueKind.Null)
+                            {
+                                @pos.GetInt32()
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var status = result.GetProperty("status").GetString();
+                                var badgeClass = status == "Completed" ? "bg-success" : status == "DidNotFinish" ? "bg-warning text-dark" : "bg-danger";
+                            }
+                            <span class="badge @badgeClass">@status</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">You have not completed any races yet.</div>
+    }
+</div>

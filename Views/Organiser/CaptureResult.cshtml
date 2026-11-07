@@ -1,0 +1,52 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "Capture Result";
+    var enrolmentId = Model.GetProperty("enrolmentId").GetInt32();
+    var participantName = Model.GetProperty("participantName").GetString();
+    var eventName = Model.GetProperty("eventName").GetString();
+    var categoryName = Model.GetProperty("categoryName").GetString();
+}
+
+<div class="container mt-4">
+    <h2>Capture Result</h2>
+    <hr />
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">@eventName - @categoryName</h5>
+            <p class="card-text">Participant: <strong>@participantName</strong></p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post" action="/Organiser/CaptureResult/@enrolmentId">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label>Finish Time (HH:MM:SS)</label>
+                <input type="text" name="finishTime" class="form-control" placeholder="e.g., 00:45:30" required />
+                <small class="text-muted">Format: hours:minutes:seconds</small>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label>Position (Optional)</label>
+                <input type="number" name="position" class="form-control" placeholder="e.g., 5" />
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="Completed">Completed</option>
+                    <option value="Disqualified">Disqualified</option>
+                    <option value="DidNotFinish">Did Not Finish</option>
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Result</button>
+        <a href="/Organiser/Events" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

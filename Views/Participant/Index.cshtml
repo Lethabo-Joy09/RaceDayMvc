@@ -1,0 +1,53 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "Participant Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Welcome, @ViewBag.Name!</h2>
+        <div>
+            <a href="/Participant/MyEnrolments" class="btn btn-outline-primary">My Enrolments</a>
+            <a href="/Participant/MyResults" class="btn btn-outline-success">My Results</a>
+            <a href="/Auth/Logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+    <hr />
+
+    <h4>Upcoming Events</h4>
+
+    @if (Model.ValueKind == System.Text.Json.JsonValueKind.Array && Model.GetArrayLength() > 0)
+    {
+        <div class="row mt-3">
+            @foreach (var ev in Model.EnumerateArray())
+            {
+                var eventId = ev.GetProperty("eventId").GetInt32();
+                var eventDate = ev.GetProperty("eventDate").GetDateTime();
+                
+                // Only show events that are Open and in the future
+                if (ev.GetProperty("status").GetString() == "Open" && eventDate >= DateTime.Now)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@ev.GetProperty("eventName").GetString()</h5>
+                                <p class="card-text text-muted mb-1">
+                                    <strong>Date:</strong> @eventDate.ToString("yyyy-MM-dd HH:mm")<br />
+                                    <strong>Location:</strong> @ev.GetProperty("location").GetString()<br />
+                                    <strong>Type:</strong> @ev.GetProperty("eventType").GetString() - @ev.GetProperty("distance").GetDecimal() km
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <a href="/Participant/EventDetails/@eventId" class="btn btn-primary w-100">View Details & Enrol</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">No upcoming events found at this time.</div>
+    }
+</div>

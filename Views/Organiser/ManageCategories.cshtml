@@ -1,0 +1,75 @@
+﻿@model System.Text.Json.JsonElement
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Global Race Categories</h2>
+        <a href="/Organiser/Events" class="btn btn-secondary">Back to Events</a>
+    </div>
+    <hr />
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Add Category Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            Add New Category
+        </div>
+        <div class="card-body">
+            <form method="post" action="/Organiser/AddCategory">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Category Name</label>
+                        <input type="text" name="categoryName" class="form-control" placeholder="e.g., 5km Fun Run" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Optional" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Distance (KM)</label>
+                        <input type="number" step="any" name="distanceKM" class="form-control" placeholder="e.g., 5.0" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Add Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- List Existing Categories -->
+    <h4>Current Categories</h4>
+    
+    @if (Model.ValueKind == System.Text.Json.JsonValueKind.Array && Model.GetArrayLength() > 0)
+    {
+        <table class="table table-striped mt-3 align-middle">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Distance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model.EnumerateArray())
+                {
+                    <tr>
+                        <td>@cat.GetProperty("categoryName").GetString()</td>
+                        <td>@cat.GetProperty("description").GetString()</td>
+                        <td>@cat.GetProperty("distanceKM").GetDecimal() km</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">
+            No categories found in the system. Use the form above to add one!
+        </div>
+    }
+</div>
