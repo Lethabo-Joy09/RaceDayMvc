@@ -8,12 +8,23 @@ namespace RaceDayMvc.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _apiBaseUrl = "https://localhost:7033/api"; 
+        private readonly string _apiBaseUrl;
 
         public ApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
+
+            // Check if we are running inside a Docker container
+            if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+            {
+                _apiBaseUrl = "http://host.docker.internal:5272/api";
+            }
+            else
+            {
+                // We are running locally in Visual Studio
+                _apiBaseUrl = "http://localhost:5272/api";
+            }
         }
 
         // Generic GET method
