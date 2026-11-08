@@ -2,10 +2,21 @@ using RaceDayMvc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient<ApiService>();
 
+// Register HttpClient with SSL bypass for Docker local development
+builder.Services.AddHttpClient<ApiService>()
+    .ConfigurePrimaryHttpMessageHandler(() =>
+    {
+        var handler = new HttpClientHandler();
+        // Ignore SSL certificate errors for local development inside Docker
+        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+        return handler;
+    });
+
+// Add Session Support
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -17,6 +28,7 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -27,7 +39,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseSession();
+app.UseSession(); // Enable Session
 
 app.UseAuthorization();
 
