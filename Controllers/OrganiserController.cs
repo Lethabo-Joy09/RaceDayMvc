@@ -52,7 +52,14 @@ namespace RaceDayMvc.Controllers
                 distance = parsedDistance,
                 eventType = eventType,
                 status = "Open",
-                categories = new object[] { }
+                // This automatically attaches Category ID 1 to the event!
+                categories = new[] {
+                    new {
+                        categoryId = 1,
+                        price = 150.00m,
+                        maxParticipants = 100
+                    }
+                }
             };
 
             var response = await _api.PostAsync("Events", eventData);
@@ -157,8 +164,6 @@ namespace RaceDayMvc.Controllers
             TempData["Error"] = $"Failed to add category: {response.StatusCode} - {errorContent}";
             return RedirectToAction("ManageCategories");
         }
-
-        // --- ENROLMENTS & RESULTS MANAGEMENT ---
 
         [HttpGet]
         public async Task<IActionResult> EventEnrolments(int id)
