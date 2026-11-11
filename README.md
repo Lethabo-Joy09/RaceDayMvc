@@ -20,8 +20,18 @@ This is the ASP.NET Core MVC web application for the RaceDay event management pl
 *   Session-based authentication
 *   Docker
 *   Bootstrap 5 for styling
+  ## Proof of Working Application
 
-## Docker Setup Instructions
+### Docker Containers Running
+<img width="1366" height="768" alt="Docker png" src="https://github.com/user-attachments/assets/a7e4f8ed-ac05-45c0-894f-ddb0d9244fa4" />
+### CI/CD Green Build
+<img width="1366" height="768" alt="Screenshot 2026-11-11 145949" src="https://github.com/user-attachments/assets/17ad02ca-4c1b-4f7f-9ee3-bfaa8d132fd3" /> 
+### Visual Studio Container View
+<img width="1366" height="768" alt="container png" src="https://github.com/user-attachments/assets/b88f30b2-d50f-4c19-a173-19a5cb3bebf6" />
+
+
+
+
 
 This application is containerized. To run it locally using Docker:
 
